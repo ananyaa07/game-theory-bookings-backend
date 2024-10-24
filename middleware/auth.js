@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/user';
 
+// Middleware to authenticate user
 const authMiddleware = (req, res, next) => {
 	const token = req.header("Authorization")?.replace("Bearer ", "");
 	console.log(token);
@@ -17,6 +18,7 @@ const authMiddleware = (req, res, next) => {
 	}
 };
 
+// Middleware to restrict access to operations personnel only
 const operationsMiddleware = (req, res, next) => {
 	if (req.user.role === "customer") {
 		return res
@@ -26,6 +28,7 @@ const operationsMiddleware = (req, res, next) => {
 	next();
 };
 
+// Middleware to restrict access to administrators only
 const adminMiddleware = (req, res, next) => {
 	if (req.user.role !== "admin") {
 		return res

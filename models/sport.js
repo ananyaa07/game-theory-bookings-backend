@@ -9,7 +9,7 @@ const sportSchema = new Schema({
   },
   relatedCentres: [{
     type: Schema.Types.ObjectId,
-    ref: 'Centre'
+    ref: 'Center'
   }],
   primaryResource: {
     type: String,

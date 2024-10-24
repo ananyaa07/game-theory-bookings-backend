@@ -1,7 +1,7 @@
 import express from "express";
-import { handleUserRegistration, handleUserLogin } from "../controllers/User/authController.js";
-import { authMiddleware,adminMiddleware  } from "../middleware/auth.js";
-import promoteUser from "../controllers/admin/promoteCustomer.js";
+import { handleUserRegistration, handleUserLogin } from "../../controllers/User/auth.controller.js";
+import { authMiddleware,adminMiddleware  } from "../../middleware/auth.js";
+import { promoteUser } from "../../controllers/Admin/promote.controller.js";
 const router = express.Router();
 
 // User Registration Route

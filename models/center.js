@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 
-const centreSchema = new Schema({
-	centreName: {
+const centerSchema = new Schema({
+	centerName: {
 		type: String,
 		required: true
 	},
@@ -19,4 +19,4 @@ const centreSchema = new Schema({
 }, 
 { timestamps: true });
 
-export default mongoose.model("Centre", centreSchema);
+export default mongoose.model("Center", centreSchema);
