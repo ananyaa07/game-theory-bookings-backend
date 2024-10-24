@@ -1,7 +1,7 @@
 import express from "express";
 import bookingController from "../../controllers/Operations/booking.controller.js";
 import { authMiddleware, operationsMiddleware } from "../../middleware/auth.js";
-import {bookingsController} from "../../controllers/User/booking.controller.js";
+import bookingsController from "../../controllers/User/booking.controller.js";
 
 
 const router = express.Router();
@@ -10,7 +10,7 @@ const router = express.Router();
 router.get("/", authMiddleware, operationsMiddleware, bookingController.getBookings);
 
 // GET /bookings/available - Retrieve available time slots for booking
-router.get("/available", authMiddleware, bookingController.getAvailableTimeSlots);
+router.get("/available", authMiddleware, bookingsController.getAvailableTimeSlots);
 
 // POST /bookings - Create a new booking
 router.post("/", authMiddleware, bookingController.createBooking);
@@ -27,7 +27,7 @@ router.get(
 router.get(
     "/my",
     authMiddleware,  
-    bookingController.getMyBookings
+    bookingsController.getMyBookings
 );
 
 export default router;

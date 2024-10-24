@@ -19,4 +19,4 @@ const centerSchema = new Schema({
 }, 
 { timestamps: true });
 
-export default mongoose.model("Center", centreSchema);
+export default mongoose.model("Center", centerSchema);
