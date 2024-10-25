@@ -5,25 +5,20 @@ import jwt from 'jsonwebtoken';
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
-  fullName: {
+  name: {
     type: String,
     required: true
   },
-  emailAddress: {
+  email: {
     type: String,
     required: true,
     unique: true
   },
-  userHandle: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  userPassword: {
+  password: {
     type: String,
     required: true
   },
-  userRole: {
+  role: {
     type: String,
     enum: ['customer', 'operations', 'admin'],
     default: 'customer'
@@ -32,10 +27,10 @@ const userSchema = new Schema({
 
 // Password hashing middleware
 userSchema.pre('save', async function(next) {
-  if (!this.isModified('userPassword')) return next();
+  if (!this.isModified('password')) return next();
   try {
     const salt = await bcrypt.genSalt(10);
-    this.userPassword = await bcrypt.hash(this.userPassword, salt);
+    this.password = await bcrypt.hash(this.password, salt);
     next();
   } catch (err) {
     next(err);
@@ -44,12 +39,12 @@ userSchema.pre('save', async function(next) {
 
 // Method to compare passwords
 userSchema.methods.validatePassword = async function(enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.userPassword);
+  return await bcrypt.compare(enteredPassword, this.password);  
 };
 
 // Method to generate JWT
 userSchema.methods.createToken = function() {
-  return jwt.sign({ id: this._id, role: this.userRole }, process.env.JWT_SECRET, { expiresIn: '1d' });
+  return jwt.sign({ id: this._id, role: this.role }, process.env.JWT_SECRET, { expiresIn: '1d' });  // Corrected 'userRole' to 'role'
 };
 
 export default mongoose.model('User', userSchema);

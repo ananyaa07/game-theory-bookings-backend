@@ -3,26 +3,25 @@ import User from "../../models/user.js";
 
 // Handles user registration by creating a new user account
 const handleUserRegistration = async (req, res) => {
-  const { fullName, emailAddress, userPassword, userHandle } = req.body;
+  const { name, email, password } = req.body;
   try {
-    const existingUser = await User.findOne({ emailAddress });
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'User already registered' });
     }
     const newUser = await User.create({ 
-      fullName, 
-      emailAddress, 
-      userPassword, 
-      userRole: 'customer', 
-      userHandle 
+      name, 
+      email, 
+      password, 
+      role: 'customer' 
     });
     const token = newUser.createToken();
     res.status(201).json({ 
       user: {
         id: newUser._id,
-        emailAddress: newUser.emailAddress,
-        userHandle: newUser.userHandle,
-        userRole: newUser.userRole 
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role 
       }, 
       token 
     });
@@ -34,13 +33,13 @@ const handleUserRegistration = async (req, res) => {
 
 // Handles user login and generates a token for authenticated users
 const handleUserLogin = async (req, res) => {
-  const { emailAddress, userPassword } = req.body;
+  const { email, password } = req.body;
   try {
-    const existingUser = await User.findOne({ emailAddress });
+    const existingUser = await User.findOne({ email });
     if (!existingUser) {
       return res.status(400).json({ message: 'Invalid login details' });
     }
-    const passwordValid = await existingUser.validatePassword(userPassword);
+    const passwordValid = await existingUser.validatePassword(password);
     if (!passwordValid) {
       return res.status(400).json({ message: 'Invalid login details' });
     }
@@ -48,9 +47,9 @@ const handleUserLogin = async (req, res) => {
     res.status(200).json({ 
       user: {
         id: existingUser._id,
-        emailAddress: existingUser.emailAddress,
-        userHandle: existingUser.userHandle,
-        userRole: existingUser.userRole 
+        name: existingUser.name,
+        email: existingUser.email,
+        role: existingUser.role 
       }, 
       token 
     });

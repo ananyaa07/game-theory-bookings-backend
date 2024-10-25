@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const centerSchema = new Schema({
-	centerName: {
+	name: {
 		type: String,
 		required: true
 	},
@@ -10,7 +10,7 @@ const centerSchema = new Schema({
 		type: String,
 		required: true
 	},
-	availableSports: [
+	sports: [
 		{
 			type: Schema.Types.ObjectId,
 			ref: "Sport"

@@ -3,19 +3,19 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const sportSchema = new Schema({
-  sportName: {
+  name: {
     type: String,
     required: true
   },
-  relatedCentres: [{
+  centers: [{
     type: Schema.Types.ObjectId,
     ref: 'Center'
   }],
-  primaryResource: {
+  resourceKind: {
     type: String,
     required: true
   },
-  availableResources: [{
+  resources: [{
     type: Schema.Types.ObjectId,
     ref: 'Resource'
   }]

@@ -3,15 +3,15 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const resourceSchema = new Schema({
-  resourceName: {
+  name: {
     type: String
   },
-  associatedSport: {
+  sport: {
     type: Schema.Types.ObjectId,
     ref: 'Sport',
     required: true
   },
-  linkedCentre: {
+  center: {
     type: Schema.Types.ObjectId,
     ref: 'Centre',
     required: true

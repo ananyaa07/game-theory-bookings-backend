@@ -21,9 +21,9 @@ const bookingsController = {
             } = req.body;
 
             // Validate required fields
-            if (!centreId || !sportId || !bookingDate || !startHour || !endHour || !status) {
+            if (!centreId || !sportId || !bookingDate || !startHour || !endHour) {
                 return res.status(400).json({
-                    error: "centreId, sportId, bookingDate, startHour, endHour, and status are required.",
+                    error: "centreId, sportId, bookingDate, startHour, and endHour are required.",
                 });
             }
 
@@ -48,9 +48,9 @@ const bookingsController = {
             formattedBookingDate.startOf("day");
 
             // Validate time slots
-            if (startHour < 4 || startHour >= 22 || endHour <= 4 || endHour > 22 || endHour <= startHour) {
+            if (startHour < 4 || startHour >= 24 || endHour <= 4 || endHour > 24 || endHour <= startHour) {
                 return res.status(400).json({
-                    error: "Invalid startHour or endHour. Times must be between 04:00 and 22:00, and endHour must be after startHour.",
+                    error: "Invalid startHour or endHour. Times must be between 04:00 and 24:00, and endHour must be after startHour.",
                 });
             }
 
@@ -62,7 +62,7 @@ const bookingsController = {
                 "Completed",
                 "Payment Pending",
             ];
-            if (!validStatuses.includes(status)) {
+            if (status && !validStatuses.includes(status)) {
                 return res.status(400).json({
                     error: `Invalid status. Allowed statuses are: ${validStatuses.join(", ")}.`,
                 });
@@ -128,7 +128,7 @@ const bookingsController = {
                     });
                 }
 
-                allocatedResourceId = resourceId; 
+                allocatedResourceId = resourceId;
             }
 
             // Create and save the new booking
@@ -140,7 +140,7 @@ const bookingsController = {
                 endHour,
                 centreId,
                 sportId,
-                status,
+                status: status || "Booking", 
                 remarks: remarks || "",
             });
 
@@ -192,7 +192,7 @@ const bookingsController = {
 
             const timeSlots = {};
             // Initialize time slots
-            for (let hour = 4; hour < 22; hour++) {
+            for (let hour = 4; hour < 24; hour++) {
                 const slotLabel = `${hour}:00 - ${hour + 1}:00`;
                 timeSlots[hour] = {
                     startHour: hour,
@@ -246,90 +246,11 @@ const bookingsController = {
                 .populate("resourceId", "name")
                 .populate("sportId", "name")
                 .populate("centreId", "name")
-                .sort({ bookingDate: -1 });
+                .sort({ bookingDate: -1, startHour: 1 });
 
             return res.status(200).json(bookings);
         } catch (err) {
             console.error("Error in getUserBookings:", err);
-            return res.status(500).json({ error: "Server error." });
-        }
-    },
-
-    // Retrieves all bookings for a specific centre
-    async getCentreBookings(req, res) {
-        try {
-            const { centreId } = req.params;
-
-            // Validate centreId parameter
-            if (!mongoose.Types.ObjectId.isValid(centreId)) {
-                return res.status(400).json({ error: "Invalid centreId." });
-            }
-
-            // Retrieve bookings for the specified centre
-            const bookings = await Booking.find({ centreId })
-                .populate("resourceId", "name")
-                .populate("sportId", "name")
-                .populate("centreId", "name")
-                .sort({ bookingDate: -1 });
-
-            return res.status(200).json(bookings);
-        } catch (err) {
-            console.error("Error in getCentreBookings:", err);
-            return res.status(500).json({ error: "Server error." });
-        }
-    },
-
-    // Updates an existing booking by ID
-    async updateBooking(req, res) {
-        try {
-            const { bookingId } = req.params;
-
-            // Validate bookingId parameter
-            if (!mongoose.Types.ObjectId.isValid(bookingId)) {
-                return res.status(400).json({ error: "Invalid bookingId." });
-            }
-
-            // Update the booking with provided details
-            const updatedBooking = await Booking.findByIdAndUpdate(
-                bookingId,
-                req.body,
-                { new: true }
-            )
-                .populate("resourceId", "name")
-                .populate("sportId", "name")
-                .populate("centreId", "name");
-
-            // Check if the booking was found
-            if (!updatedBooking) {
-                return res.status(404).json({ error: "Booking not found." });
-            }
-
-            return res.status(200).json(updatedBooking);
-        } catch (err) {
-            console.error("Error in updateBooking:", err);
-            return res.status(500).json({ error: "Server error." });
-        }
-    },
-
-    // Deletes a booking by its ID
-    async deleteBooking(req, res) {
-        try {
-            const { bookingId } = req.params;
-
-            // Validate bookingId parameter
-            if (!mongoose.Types.ObjectId.isValid(bookingId)) {
-                return res.status(400).json({ error: "Invalid bookingId." });
-            }
-
-            // Attempt to delete the booking
-            const deletedBooking = await Booking.findByIdAndDelete(bookingId);
-            if (!deletedBooking) {
-                return res.status(404).json({ error: "Booking not found." });
-            }
-
-            return res.status(204).send(); // No content response
-        } catch (err) {
-            console.error("Error in deleteBooking:", err);
             return res.status(500).json({ error: "Server error." });
         }
     },

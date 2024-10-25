@@ -8,12 +8,12 @@ const promoteUser = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    if (user.userRole !== "customer") {
+    if (user.role !== "customer") {
       return res
         .status(400)
         .json({ message: "Only customers can be promoted to operations" });
     }
-    user.userRole = "operations";
+    user.role = "operations";
     await user.save();
     res
       .status(200)
