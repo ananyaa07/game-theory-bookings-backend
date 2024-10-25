@@ -13,7 +13,7 @@ router.get("/", authMiddleware, operationsMiddleware, bookingController.getBooki
 router.get("/available", authMiddleware, bookingsController.getAvailableTimeSlots);
 
 // POST /bookings - Create a new booking
-router.post("/", authMiddleware, bookingController.createBooking);
+router.post("/create", authMiddleware, bookingController.createBooking);
 
 // GET /bookings/user/:userId -	Retrieve bookings for a specific user
 router.get(
@@ -23,11 +23,11 @@ router.get(
     bookingsController.getUserBookings
 );
 
-// GET /bookings/my - Retrieve bookings for the current user
-router.get(
-    "/my",
-    authMiddleware,  
-    bookingsController.getMyBookings
-);
+// // GET /bookings/my - Retrieve bookings for the current user
+// router.get(
+//     "/my",
+//     authMiddleware,  
+//     bookingsController.getMyBookings
+// );
 
 export default router;
