@@ -1,22 +1,22 @@
-import Center from "../../models/center.js"; 
+import Center from "../../models/center.js";
 import mongoose from "mongoose";
 
 const centerController = {
 
 	async createCenter(req, res) {
 		try {
-			const { centerName, address, availableSports } = req.body;
+			const { name, address, sports } = req.body;
 
 			// Validate required fields
-			if (!centerName || !address) {
+			if (!name || !address) {
 				return res.status(400).json({ error: "Center name and address are required." });
 			}
 
 			// Create new center
 			const newCenter = new Center({
-				centerName,
+				name,
 				address,
-				availableSports: availableSports || [],
+				sports: sports || [], 
 			});
 
 			await newCenter.save();
@@ -30,7 +30,7 @@ const centerController = {
 
 	async getCenters(req, res) {
 		try {
-			const centers = await Center.find().select("centerName address");
+			const centers = await Center.find().select("name address");
 
 			return res.status(200).json(centers);
 		} catch (err) {
@@ -48,7 +48,8 @@ const centerController = {
 				return res.status(400).json({ error: "Invalid center ID." });
 			}
 
-			const center = await Center.findById(id).populate("availableSports", "name");
+			// Find center by id and populate sports
+			const center = await Center.findById(id).populate("sports", "name");
 
 			if (!center) {
 				return res.status(404).json({ error: "Center not found." });
@@ -64,7 +65,7 @@ const centerController = {
 	async updateCenter(req, res) {
 		try {
 			const { id } = req.params;
-			const { centerName, address, availableSports } = req.body;
+			const { name, address, sports } = req.body;
 
 			// Validate ObjectId
 			if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -74,7 +75,7 @@ const centerController = {
 			// Update center
 			const updatedCenter = await Center.findByIdAndUpdate(
 				id,
-				{ centerName, address, availableSports },
+				{ name, address, sports },
 				{ new: true, runValidators: true }
 			);
 

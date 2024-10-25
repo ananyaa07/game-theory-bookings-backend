@@ -14,16 +14,19 @@ const bookingController = {
 		try {
 			const { centreId, sportId, bookingDate } = req.query;
 
+			// Validate input parameters
 			if (!centreId || !sportId || !bookingDate) {
 				return res
 					.status(400)
 					.json({ error: "centreId, sportId, and bookingDate are required." });
 			}
 
+			// Validate IDs
 			if (!mongoose.Types.ObjectId.isValid(centreId) || !mongoose.Types.ObjectId.isValid(sportId)) {
 				return res.status(400).json({ error: "Invalid centreId or sportId." });
 			}
 
+			// Validate date format
 			const selectedDate = moment(bookingDate, "YYYY-MM-DD", true);
 			if (!selectedDate.isValid()) {
 				return res.status(400).json({ error: "Invalid date format. Use YYYY-MM-DD." });
@@ -33,6 +36,7 @@ const bookingController = {
 			const endOfDay = selectedDate.clone().endOf("day").toDate();
 			const currentTime = moment().tz("UTC");
 
+			// Update bookings that have ended as "Completed"
 			await Booking.updateMany(
 				{
 					centreId,
@@ -44,12 +48,13 @@ const bookingController = {
 				{ $set: { status: "Completed" } }
 			);
 
+			// Fetch bookings for the specified centre, sport, and date
 			const fetchedBookings = await Booking.find({
 				centreId,
 				sportId,
 				bookingDate: startOfDay,
 			})
-				.populate("resourceId", "resourceName")
+				.populate("resourceId", "name")
 				.populate("userId", "name email");
 
 			return res.status(200).json(fetchedBookings);
@@ -73,12 +78,14 @@ const bookingController = {
 				remarks,
 			} = req.body;
 
+			// Validate input parameters
 			if (!centreId || !sportId || !bookingDate || !startHour || !endHour || !status) {
 				return res.status(400).json({
 					error: "centreId, sportId, bookingDate, startHour, endHour, and status are required.",
 				});
 			}
 
+			// Validate IDs
 			if (!mongoose.Types.ObjectId.isValid(centreId) || !mongoose.Types.ObjectId.isValid(sportId)) {
 				return res.status(400).json({ error: "Invalid centreId or sportId." });
 			}
@@ -87,6 +94,7 @@ const bookingController = {
 				return res.status(400).json({ error: "Invalid resourceId." });
 			}
 
+			// Validate date format
 			const selectedDate = moment(bookingDate, "YYYY-MM-DD", true);
 			if (!selectedDate.isValid()) {
 				return res.status(400).json({ error: "Invalid date format. Use YYYY-MM-DD." });
@@ -111,13 +119,14 @@ const bookingController = {
 			let chosenResourceId = resourceId;
 
 			if (!resourceId) {
-				const allResources = await Resource.find({ associatedSport: sportId, linkedCentre: centreId }).select("_id");
+				const allResources = await Resource.find({ sport: sportId, center: centreId }).select("_id");
 				if (!allResources.length) {
 					return res.status(404).json({ error: "No resources found for the specified centre and sport." });
 				}
 
 				const resourceIdsList = allResources.map((r) => r._id);
 
+				// Check for conflicting bookings
 				const overlappingBookings = await Booking.find({
 					resourceId: { $in: resourceIdsList },
 					bookingDate: selectedDate.toDate(),
@@ -133,6 +142,7 @@ const bookingController = {
 
 				const availableResourceIds = resourceIdsList.filter((id) => !alreadyBookedResourceIds.includes(id.toString()));
 
+				// If no resources are available for the selected time slot
 				if (!availableResourceIds.length) {
 					return res.status(409).json({ error: "No resources available for the selected time slot." });
 				}
@@ -166,6 +176,7 @@ const bookingController = {
 				remarks,
 			});
 
+			// Save the booking and return the response
 			await newBooking.save();
 			return res.status(201).json(newBooking);
 		} catch (err) {

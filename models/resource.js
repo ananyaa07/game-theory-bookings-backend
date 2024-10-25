@@ -13,7 +13,7 @@ const resourceSchema = new Schema({
   },
   center: {
     type: Schema.Types.ObjectId,
-    ref: 'Centre',
+    ref: 'Center',
     required: true
   }
 }, { timestamps: true });

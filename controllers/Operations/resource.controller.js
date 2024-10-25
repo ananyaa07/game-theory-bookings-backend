@@ -7,28 +7,28 @@ import mongoose from "mongoose";
 const resourceController = {
   async createResource(req, res) {
     try {
-      const { resourceName, associatedSport, linkedCentre } = req.body;
+      const { name, sport, center } = req.body;
 
       // Validate required fields
-      if (!resourceName || !associatedSport || !linkedCentre) {
+      if (!name || !sport || !center) {
         return res
           .status(400)
-          .json({ error: "resourceName, associatedSport, and linkedCentre are required." });
+          .json({ error: "name, sport, and center are required." });
       }
 
       // Validate ObjectIds
       if (
-        !mongoose.Types.ObjectId.isValid(associatedSport) ||
-        !mongoose.Types.ObjectId.isValid(linkedCentre)
+        !mongoose.Types.ObjectId.isValid(sport) ||
+        !mongoose.Types.ObjectId.isValid(center)
       ) {
-        return res.status(400).json({ error: "Invalid associatedSport or linkedCentre." });
+        return res.status(400).json({ error: "Invalid sport or center." });
       }
 
       // Create new resource
       const newResource = new Resource({
-        resourceName,
-        associatedSport,
-        linkedCentre,
+        name,
+        sport,
+        center,
       });
 
       await newResource.save();
@@ -42,25 +42,25 @@ const resourceController = {
 
   async getResources(req, res) {
     try {
-      const { linkedCentre, associatedSport } = req.query;
+      const { center, sport } = req.query;
 
       let query = {};
 
-      if (linkedCentre) {
-        if (!mongoose.Types.ObjectId.isValid(linkedCentre)) {
-          return res.status(400).json({ error: "Invalid linkedCentre." });
+      if (center) {
+        if (!mongoose.Types.ObjectId.isValid(center)) {
+          return res.status(400).json({ error: "Invalid center." });
         }
-        query.linkedCentre = linkedCentre;
+        query.center = center;
       }
 
-      if (associatedSport) {
-        if (!mongoose.Types.ObjectId.isValid(associatedSport)) {
-          return res.status(400).json({ error: "Invalid associatedSport." });
+      if (sport) {
+        if (!mongoose.Types.ObjectId.isValid(sport)) {
+          return res.status(400).json({ error: "Invalid sport." });
         }
-        query.associatedSport = associatedSport;
+        query.sport = sport;
       }
 
-      const resources = await Resource.find(query).select("resourceName");
+      const resources = await Resource.find(query).select("name");
 
       return res.status(200).json(resources);
     } catch (err) {
@@ -79,8 +79,8 @@ const resourceController = {
       }
 
       const resource = await Resource.findById(id)
-        .populate("associatedSport", "name")
-        .populate("linkedCentre", "name location");
+        .populate("sport", "name")
+        .populate("center", "name location");
 
       if (!resource) {
         return res.status(404).json({ error: "Resource not found." });
@@ -96,7 +96,7 @@ const resourceController = {
   async updateResource(req, res) {
     try {
       const { id } = req.params;
-      const { resourceName, associatedSport, linkedCentre } = req.body;
+      const { name, sport, center } = req.body;
 
       // Validate ObjectId
       if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -104,26 +104,26 @@ const resourceController = {
       }
 
       // Validate required fields
-      if (!resourceName && !associatedSport && !linkedCentre) {
+      if (!name && !sport && !center) {
         return res.status(400).json({
-          error: "At least one of resourceName, associatedSport, or linkedCentre must be provided.",
+          error: "At least one of name, sport, or center must be provided.",
         });
       }
 
       let updateData = {};
 
-      if (resourceName) updateData.resourceName = resourceName;
-      if (associatedSport) {
-        if (!mongoose.Types.ObjectId.isValid(associatedSport)) {
-          return res.status(400).json({ error: "Invalid associatedSport." });
+      if (name) updateData.name = name;
+      if (sport) {
+        if (!mongoose.Types.ObjectId.isValid(sport)) {
+          return res.status(400).json({ error: "Invalid sport." });
         }
-        updateData.associatedSport = associatedSport;
+        updateData.sport = sport;
       }
-      if (linkedCentre) {
-        if (!mongoose.Types.ObjectId.isValid(linkedCentre)) {
-          return res.status(400).json({ error: "Invalid linkedCentre." });
+      if (center) {
+        if (!mongoose.Types.ObjectId.isValid(center)) {
+          return res.status(400).json({ error: "Invalid center." });
         }
-        updateData.linkedCentre = linkedCentre;
+        updateData.center = center;
       }
 
       // Update resource

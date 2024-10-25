@@ -1,25 +1,35 @@
 import Sport from "../../models/sport.js";
-import Centre from "../../models/center.js";
+import Center from "../../models/center.js";
 import mongoose from "mongoose";
 
 const sportController = {
   async createSport(req, res) {
     try {
-      const { sportName, primaryResource, availableResources } = req.body;
+      const { name, resourceKind, centers, resources } = req.body;
 
       // Validate required fields
-      if (!sportName || !primaryResource) {
-        return res.status(400).json({ error: "sportName and primaryResource are required." });
+      if (!name || !resourceKind) {
+        return res.status(400).json({ error: "Name and resourceKind are required." });
       }
 
       // Create new sport
       const newSport = new Sport({
-        sportName,
-        primaryResource,
-        availableResources: availableResources || [],
+        name,
+        resourceKind,
+        centers: centers || [],
+        resources: resources || [],
       });
 
+      // Save the new sport
       await newSport.save();
+
+      // Update centers with the new sport
+      if (centers && centers.length > 0) {
+        await Center.updateMany(
+          { _id: { $in: centers } },
+          { $push: { sports: newSport._id } }
+        );
+      }
 
       return res.status(201).json(newSport);
     } catch (err) {
@@ -39,19 +49,19 @@ const sportController = {
         }
 
         // Find the center
-        const center = await Centre.findById(centerId).populate("availableSports", "sportName");
+        const center = await Center.findById(centerId).populate("sports", "name resourceKind");
 
         if (!center) {
           return res.status(404).json({ error: "Center not found." });
         }
 
         // Return the sports offered at the center
-        const sports = center.availableSports;
+        const sports = center.sports;
 
         return res.status(200).json(sports);
       } else {
-        // If no centerId, return all sports
-        const sports = await Sport.find().select("sportName primaryResource");
+        // If no centerId is provided, return all sports
+        const sports = await Sport.find().select("name resourceKind");
         return res.status(200).json(sports);
       }
     } catch (err) {
@@ -69,7 +79,10 @@ const sportController = {
         return res.status(400).json({ error: "Invalid sport ID." });
       }
 
-      const sport = await Sport.findById(id).populate("availableResources", "name");
+      // Find the sport and populate related resources and centers
+      const sport = await Sport.findById(id)
+        .populate("resources", "name")
+        .populate("centers", "name");
 
       if (!sport) {
         return res.status(404).json({ error: "Sport not found." });
@@ -85,7 +98,7 @@ const sportController = {
   async updateSport(req, res) {
     try {
       const { id } = req.params;
-      const { sportName, primaryResource, availableResources } = req.body;
+      const { name, resourceKind, centers, resources } = req.body;
 
       // Validate ObjectId
       if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -93,17 +106,18 @@ const sportController = {
       }
 
       // Validate at least one field for update
-      if (!sportName && !primaryResource && !availableResources) {
+      if (!name && !resourceKind && !centers && !resources) {
         return res.status(400).json({
-          error: "At least one of sportName, primaryResource, or availableResources must be provided.",
+          error: "At least one of name, resourceKind, centers, or resources must be provided.",
         });
       }
 
       // Prepare update data
       const updateData = {};
-      if (sportName) updateData.sportName = sportName;
-      if (primaryResource) updateData.primaryResource = primaryResource;
-      if (availableResources) updateData.availableResources = availableResources;
+      if (name) updateData.name = name;
+      if (resourceKind) updateData.resourceKind = resourceKind;
+      if (centers) updateData.centers = centers;
+      if (resources) updateData.resources = resources;
 
       // Update sport
       const updatedSport = await Sport.findByIdAndUpdate(id, updateData, {
@@ -113,6 +127,14 @@ const sportController = {
 
       if (!updatedSport) {
         return res.status(404).json({ error: "Sport not found." });
+      }
+
+      // Update centers if provided
+      if (centers && centers.length > 0) {
+        await Center.updateMany(
+          { _id: { $in: centers } },
+          { $push: { sports: updatedSport._id } }
+        );
       }
 
       return res.status(200).json(updatedSport);
@@ -131,11 +153,18 @@ const sportController = {
         return res.status(400).json({ error: "Invalid sport ID." });
       }
 
+      // Delete the sport
       const deletedSport = await Sport.findByIdAndDelete(id);
 
       if (!deletedSport) {
         return res.status(404).json({ error: "Sport not found." });
       }
+
+      // Remove the sport from associated centers
+      await Center.updateMany(
+        { sports: id },
+        { $pull: { sports: id } }
+      );
 
       return res.status(200).json({ message: "Sport deleted successfully." });
     } catch (err) {
