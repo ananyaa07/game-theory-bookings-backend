@@ -10,10 +10,10 @@ const router = express.Router();
 router.get("/", authMiddleware, operationsMiddleware, bookingController.getBookings);
 
 // GET /bookings/available - Retrieve available time slots for booking
-router.get("/available", authMiddleware, bookingsController.getAvailableTimeSlots);
+router.get("/available", authMiddleware, bookingController.getAvailableTimeSlots);
 
 // POST /bookings - Create a new booking
-router.post("/create", authMiddleware, bookingController.createBooking);
+router.post("/", authMiddleware, bookingController.createBooking);
 
 // GET /bookings/user/:userId -	Retrieve bookings for a specific user
 router.get(
@@ -23,11 +23,7 @@ router.get(
     bookingsController.getUserBookings
 );
 
-// // GET /bookings/my - Retrieve bookings for the current user
-// router.get(
-//     "/my",
-//     authMiddleware,  
-//     bookingsController.getMyBookings
-// );
+// GET /bookings/my - Retrieve bookings for the current user
+router.get("/my", authMiddleware, bookingsController.getUserBookings);
 
 export default router;

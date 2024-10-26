@@ -6,7 +6,6 @@ const router = express.Router();
 // POST /centers - Create a new center
 router.post("/", authMiddleware, operationsMiddleware, centerController.createCenter);
 
-
 // GET /centers - Retrieve all centers
 router.get(
 	"/",
@@ -37,6 +36,30 @@ router.delete(
 	authMiddleware,
 	operationsMiddleware,
 	centerController.deleteCenter
+);
+
+// GET /centers/:id/sports - Retrieve all sports of a center
+router.get(
+	"/:id/sports",
+	authMiddleware,
+	operationsMiddleware,
+	centerController.getAllSportsInCenter
+);
+
+// POST /centers/:id/sports - Add a sport to a center
+router.post(
+	"/:id/sports",
+	authMiddleware,
+	operationsMiddleware,
+	centerController.addSportToCenter
+);
+
+// DELETE /centers/:id/sports/:sportId - Remove a sport from a center
+router.delete(
+	"/:id/sports/:sportId",
+	authMiddleware,
+	operationsMiddleware,
+	centerController.deleteSportFromCenter
 );
 
 export default router;

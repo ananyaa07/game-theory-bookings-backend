@@ -60,7 +60,7 @@ const resourceController = {
         query.sport = sport;
       }
 
-      const resources = await Resource.find(query).select("name");
+      const resources = await Resource.find(query).select("name sport center");
 
       return res.status(200).json(resources);
     } catch (err) {

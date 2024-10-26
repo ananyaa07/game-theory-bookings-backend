@@ -20,7 +20,7 @@ const authMiddleware = (req, res, next) => {
 const operationsMiddleware = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
-    if (!user || user.role !== 'operations') {
+    if (!user || user.role === 'customer') {
       return res
         .status(403)
         .json({ message: "Access restricted to operations personnel only" });

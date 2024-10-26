@@ -3,39 +3,39 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const bookingSchema = new Schema({
-	userId: {
+	user: {
 		type: Schema.Types.ObjectId,
 		ref: "User",
 		required: true
 	},
-	resourceId: {
+	resource: {
 		type: Schema.Types.ObjectId,
 		ref: "Resource",
 		required: true
 	},
-	endHour: {
+	endTime: {
 		type: Number,
 		required: true,
 		min: 4,
 		max: 24,
 		validate: {
 			validator(value) {
-				return value > this.startHour;
+				return value > this.startTime;
 			},
 			message: "End hour must be greater than start hour."
 		}
 	},
-	bookingDate: {
+	date: {
 		type: Date,
 		required: true
 	},
-	startHour: {
+	startTime: {
 		type: Number,
 		required: true,
 		min: 4,
 		max: 24
 	},
-	status: {
+	type: {
 		type: String,
 		enum: [
 			"Booking",
@@ -48,16 +48,16 @@ const bookingSchema = new Schema({
 		default: "Booking",
 		required: true
 	},
-	remarks: {
+	note: {
 		type: String,
 		default: ""
 	},
-	centreId: {
+	center: {
 		type: Schema.Types.ObjectId,
 		ref: "Centre",
 		required: true
 	},
-	sportId: {
+	sport: {
 		type: Schema.Types.ObjectId,
 		ref: "Sport",
 		required: true
