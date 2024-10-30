@@ -10,7 +10,6 @@ router.post("/", authMiddleware, operationsMiddleware, centerController.createCe
 router.get(
 	"/",
 	authMiddleware,
-	operationsMiddleware,
 	centerController.getCenters
 );
 

@@ -54,7 +54,7 @@ const bookingSchema = new Schema({
 	},
 	center: {
 		type: Schema.Types.ObjectId,
-		ref: "Centre",
+		ref: "Center",
 		required: true
 	},
 	sport: {

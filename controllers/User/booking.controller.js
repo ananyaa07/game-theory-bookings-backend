@@ -1,6 +1,6 @@
 import Booking from "../../models/booking.js";
 import Resource from "../../models/resource.js";
-import Centre from "../../models/center.js";
+import Center from "../../models/center.js";
 import Sport from "../../models/sport.js";
 import mongoose from "mongoose";
 import moment from "moment-timezone";
@@ -336,25 +336,27 @@ const bookingsController = {
 	// Retrieves all bookings for a specific user by their ID
 	async getUserBookings(req, res) {
 		try {
-            const { userId } = req.params;
-
-            // Validate ObjectId
-            if (!mongoose.Types.ObjectId.isValid(userId)) {
-                return res.status(400).json({ error: "Invalid user ID." });
-            }
-
-            const bookings = await Booking.find({ user: userId })
-                .populate("resource", "name")
-                .populate("center", "name")
-                .populate("sport", "name")
-                .select("date startTime endTime type note");
-
-            return res.status(200).json(bookings);
-        } catch (err) {
-            console.error("Error in getUserBookings:", err);
-            return res.status(500).json({ error: "Server error." });
-        }
+			const { userId } = req.params;
+	
+			// Validate ObjectId
+			if (!mongoose.Types.ObjectId.isValid(userId)) {
+				return res.status(400).json({ error: "Invalid user ID." });
+			}
+	
+			// Retrieve bookings for the specified user and populate the related fields
+			const bookings = await Booking.find({ user: userId })
+				.populate("resource", "name")  
+				.populate("center", "name")    
+				.populate("sport", "name")     
+				.select("date startTime endTime type note");
+	
+			return res.status(200).json(bookings);
+		} catch (err) {
+			console.error("Error in getUserBookings:", err);
+			return res.status(500).json({ error: "Server error." });
+		}
 	},
+	
 };
 
 export default bookingsController;

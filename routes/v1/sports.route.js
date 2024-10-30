@@ -15,7 +15,6 @@ router.post(
 router.get(
 	"/",
 	authMiddleware,
-	operationsMiddleware,
 	sportController.getSports
 );
 

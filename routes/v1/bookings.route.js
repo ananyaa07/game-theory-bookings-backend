@@ -19,7 +19,6 @@ router.post("/", authMiddleware, bookingController.createBooking);
 router.get(
     "/user/:userId",
     authMiddleware,
-    operationsMiddleware, 
     bookingsController.getUserBookings
 );
 
