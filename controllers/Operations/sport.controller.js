@@ -5,17 +5,16 @@ import mongoose from "mongoose";
 const sportController = {
   async createSport(req, res) {
     try {
-      const { name, resourceKind, centers, resources } = req.body;
+      const { name,centers, resources } = req.body;
 
       // Validate required fields
-      if (!name || !resourceKind) {
-        return res.status(400).json({ error: "Name and resourceKind are required." });
+      if (!name) {
+        return res.status(400).json({ error: "Name is required." });
       }
 
       // Create new sport
       const newSport = new Sport({
         name,
-        resourceKind,
         centers: centers || [],
         resources: resources || [],
       });
@@ -41,34 +40,34 @@ const sportController = {
   async getSports(req, res) {
     try {
       const { centerId } = req.query;
-
+  
       if (centerId) {
         // Validate ObjectId
         if (!mongoose.Types.ObjectId.isValid(centerId)) {
           return res.status(400).json({ error: "Invalid centerId." });
         }
-
-        // Find the center
-        const center = await Center.findById(centerId).populate("sports", "name resourceKind");
-
+  
+        // Find the center and populate sports
+        const center = await Center.findById(centerId).populate("sports");
+  
         if (!center) {
           return res.status(404).json({ error: "Center not found." });
         }
-
+  
         // Return the sports offered at the center
         const sports = center.sports;
-
-        return res.status(200).json(sports);
+  
+        return res.status(200).json(sports); // Sends an array of sport objects
       } else {
         // If no centerId is provided, return all sports
-        const sports = await Sport.find().select("name resourceKind");
-        return res.status(200).json(sports);
+        const sports = await Sport.find().select("name"); // Only select the 'name' field
+        return res.status(200).json(sports); // Sends an array of sport objects
       }
     } catch (err) {
       console.error("Error in getSports:", err);
       return res.status(500).json({ error: "Server error." });
     }
-  },
+  },  
 
   async getSportById(req, res) {
     try {
@@ -98,7 +97,7 @@ const sportController = {
   async updateSport(req, res) {
     try {
       const { id } = req.params;
-      const { name, resourceKind, centers, resources } = req.body;
+      const { name,centers, resources } = req.body;
 
       // Validate ObjectId
       if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -106,16 +105,15 @@ const sportController = {
       }
 
       // Validate at least one field for update
-      if (!name && !resourceKind && !centers && !resources) {
+      if (!name && !centers && !resources) {
         return res.status(400).json({
-          error: "At least one of name, resourceKind, centers, or resources must be provided.",
+          error: "At least one of name,centers, or resources must be provided.",
         });
       }
 
       // Prepare update data
       const updateData = {};
       if (name) updateData.name = name;
-      if (resourceKind) updateData.resourceKind = resourceKind;
       if (centers) updateData.centers = centers;
       if (resources) updateData.resources = resources;
 

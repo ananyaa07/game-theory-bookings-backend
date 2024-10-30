@@ -87,17 +87,18 @@ const bookingsController = {
 				date,
 				startTime,
 				endTime,
-				type,
 				note,
 			} = req.body;
 
+			let type = req.body.type || "Booking" ;
+			
 			// Validate required fields
-			if (!centerId || !sportId || !date || !startTime || !endTime || !type) {
+			if (!centerId || !sportId || !date || !startTime || !endTime ) {
 				return res.status(400).json({
 					error:
-						"centerId, sportId, date, startTime, endTime, and type are required.",
+						"centerId, sportId, date, startTime, endTime, are required.",
 				});
-			}
+			}	
 
 			// Validate ObjectIds
 			if (

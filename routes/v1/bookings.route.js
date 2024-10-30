@@ -12,8 +12,11 @@ router.get("/", authMiddleware, operationsMiddleware, bookingController.getBooki
 // GET /bookings/available - Retrieve available time slots for booking
 router.get("/available", authMiddleware, bookingController.getAvailableTimeSlots);
 
-// POST /bookings - Create a new booking
+// POST /bookings - Create a new booking by customer
 router.post("/", authMiddleware, bookingController.createBooking);
+
+//POST /bookings - Create a new booking by operations
+router.post("/operations", authMiddleware, operationsMiddleware, bookingController.createBooking);
 
 // GET /bookings/user/:userId -	Retrieve bookings for a specific user
 router.get(

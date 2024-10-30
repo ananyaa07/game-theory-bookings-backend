@@ -11,10 +11,6 @@ const sportSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Center'
   }],
-  resourceKind: {
-    type: String,
-    required: true
-  },
   resources: [{
     type: Schema.Types.ObjectId,
     ref: 'Resource'
