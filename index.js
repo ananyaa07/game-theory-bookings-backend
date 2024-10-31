@@ -16,8 +16,10 @@ dotenv.config();
 
 const app = express();
 
-// Use CORS and body-parser middleware
+// Use CORS to allow all origins
 app.use(cors());
+
+// Use body-parser middleware
 app.use(bodyParser.json());
 
 // Connect to MongoDB
