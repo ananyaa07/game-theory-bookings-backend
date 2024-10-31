@@ -117,3 +117,7 @@ game-theory-bookings-backend/
 ## The postman collection link is given below:
 
 https://documenter.getpostman.com/view/34148883/2sAY4vgNHQ
+
+## I have deployed backend on Render. The link is given below:
+
+https://game-theory-bookings-backend.onrender.com
