@@ -114,3 +114,6 @@ game-theory-bookings-backend/
 - **JWT Authentication**: Secures routes by validating tokens.
 - **Role-based Access Control**: Ensures only authorized users (admin, operations) access sensitive endpoints.
 
+## The postman collection link is given below:
+
+https://documenter.getpostman.com/view/34148883/2sAY4vgNHQ
